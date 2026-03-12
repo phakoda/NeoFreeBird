@@ -4895,3 +4895,47 @@ static NSBundle *BHBundle() {
         }
     }
 %end
+
+// MARK: Localization fallback for sideloaded X 11.71.1
+// Some new X features (DM PIN entry, encrypted DMs) have localization keys
+// that aren't resolved when the app is sideloaded. This provides English fallbacks.
+%hook NSBundle
+- (NSString *)localizedStringForKey:(NSString *)key value:(NSString *)value table:(NSString *)tableName {
+    NSString *result = %orig;
+
+    // If the result equals the key, the string wasn't found — provide fallback
+    if (result && key && [result isEqualToString:key]) {
+        static NSDictionary *fallbackStrings = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            fallbackStrings = @{
+                // DM PIN Entry
+                @"DM_PIN_ENTRY_ENTER_PASSCODE_TITLE": @"Enter Passcode",
+                @"DM_PIN_ENTRY_ENTER_PASSCODE_MESSAGE": @"Enter your passcode to access messages",
+                @"DM_PIN_ENTRY_FORGOT_PIN": @"Forgot PIN?",
+                @"DM_PIN_ENTRY_CREATE_PASSCODE_TITLE": @"Create Passcode",
+                @"DM_PIN_ENTRY_CREATE_PASSCODE_MESSAGE": @"Create a passcode to secure your messages",
+                @"DM_PIN_ENTRY_CONFIRM_PASSCODE_TITLE": @"Confirm Passcode",
+                @"DM_PIN_ENTRY_CONFIRM_PASSCODE_MESSAGE": @"Re-enter your passcode to confirm",
+                @"DM_PIN_ENTRY_PASSCODE_MISMATCH": @"Passcodes don't match. Try again.",
+                @"DM_PIN_ENTRY_WRONG_PASSCODE": @"Wrong passcode. Try again.",
+                // Encrypted DMs
+                @"DM_ENCRYPTED_CONVERSATION_DISCLAIMER": @"Messages are encrypted",
+                @"DM_ENCRYPTION_BADGE_LABEL": @"Encrypted",
+                // Common DM
+                @"DM_CONVERSATION_EMPTY_STATE_TITLE": @"No messages yet",
+                @"DM_CONVERSATION_EMPTY_STATE_MESSAGE": @"Start a conversation",
+                @"DM_NEW_MESSAGE_BUTTON": @"New message",
+                @"DM_SEARCH_PLACEHOLDER": @"Search Direct Messages",
+            };
+        });
+
+        NSString *fallback = fallbackStrings[key];
+        if (fallback) {
+            return fallback;
+        }
+    }
+
+    return result;
+}
+%end
