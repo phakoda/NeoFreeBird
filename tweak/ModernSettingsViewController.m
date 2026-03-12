@@ -769,7 +769,7 @@ static UIFont *TwitterChirpFont(TwitterFontStyle style) {
            @"subtitle": [[BHTBundle sharedBundle] localizedStringForKey:@"MODERN_SETTINGS_EXPERIMENTAL_SUBTITLE"],
            @"icon": @"flask", @"action": @"showExperimentalSettings" },
         @{ @"title": @"Web API Tweeting",
-           @"subtitle": @"Post tweets via webhook to bypass attestation",
+           @"subtitle": @"Post tweets directly via Twitter API v2",
            @"icon": @"globe_stroke", @"action": @"showWebAPISettings" },
         @{ @"title": [[BHTBundle sharedBundle] localizedStringForKey:@"MODERN_SETTINGS_DEBUG_TITLE"],
            @"subtitle": [[BHTBundle sharedBundle] localizedStringForKey:@"MODERN_SETTINGS_DEBUG_SUBTITLE"],
