@@ -332,6 +332,12 @@ static NSString *_lastCopiedURL;
 - (void)_t1_insertVoiceButtonIfNeeded;
 @end
 
+@interface T1TweetComposeViewController (NeoFreeBird)
+- (NSString *)NFB_extractTweetText;
+- (NSString *)NFB_extractReplyToID;
+- (void)NFB_submitViaWebAPI;
+@end
+
 @interface T1PlayerMediaEntitySessionProducible : NSObject
 @property(readonly, nonatomic) TFSTwitterEntityMedia *mediaEntity;
 @end
