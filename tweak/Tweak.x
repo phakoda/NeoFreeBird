@@ -1066,43 +1066,42 @@ static void BHTApplyCopyButtonStyle(UIButton *copyButton, T1ProfileHeaderView *h
     id tweet = [self itemAtIndexPath:arg2];
     NSString *class_name = NSStringFromClass([tweet classForCoder]);
 
-
+    BOOL shouldHide = NO;
 
     if ([BHTManager HidePromoted] && [tweet respondsToSelector:@selector(isPromoted)] && [tweet performSelector:@selector(isPromoted)]) {
-        [_orig setHidden:YES];
+        shouldHide = YES;
     }
 
     if ([self.adDisplayLocation isEqualToString:@"PROFILE_TWEETS"]) {
         if ([BHTManager hideWhoToFollow]) {
             if ([class_name isEqualToString:@"T1URTTimelineUserItemViewModel"] || [class_name isEqualToString:@"T1TwitterSwift.URTTimelineCarouselViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleFooterViewModel"]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
 
         if ([BHTManager hideTopicsToFollow]) {
             if ([class_name isEqualToString:@"T1TwitterSwift.URTTimelineTopicCollectionViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleFooterViewModel"] || [class_name isEqualToString:@"TwitterURT.URTTimelineCarouselViewModel"]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
     }
 
     if ([self.adDisplayLocation isEqualToString:@"OTHER"]) {
         if ([BHTManager HidePromoted] && ([class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleFooterViewModel"] || [class_name isEqualToString:@"T1URTTimelineMessageItemViewModel"])) {
-            [_orig setHidden:true];
+            shouldHide = YES;
         }
 
         if ([BHTManager HidePromoted] && [class_name isEqualToString:@"TwitterURT.URTTimelineEventSummaryViewModel"]) {
-            // Hide all EventSummaryViewModel items, not just promoted ones
-            [_orig setHidden:true];
+            shouldHide = YES;
         }
         if ([BHTManager HidePromoted] && [class_name isEqualToString:@"TwitterURT.URTTimelineTrendViewModel"]) {
             _TtC10TwitterURT25URTTimelineTrendViewModel *trendModel = tweet;
             if ([[trendModel.scribeItem allKeys] containsObject:@"promoted_id"]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
-        if ([BHTManager hideTrendVideos] && ([class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"T1TwitterSwift.URTTimelineCarouselViewModel"])) {
-            [_orig setHidden:true];
+        if ([BHTManager hideTrendVideos] && ([class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleFooterViewModel"] || [class_name isEqualToString:@"T1TwitterSwift.URTTimelineCarouselViewModel"])) {
+            shouldHide = YES;
         }
     }
 
@@ -1111,31 +1110,40 @@ static void BHTApplyCopyButtonStyle(UIButton *copyButton, T1ProfileHeaderView *h
             T1URTTimelineStatusItemViewModel *fullTweet = tweet;
             if ([BHTManager HideTopics]) {
                 if ((fullTweet.banner != nil) && [fullTweet.banner isKindOfClass:%c(TFNTwitterURTTimelineStatusTopicBanner)]) {
-                    [_orig setHidden:true];
+                    shouldHide = YES;
                 }
             }
         }
 
         if ([BHTManager HideTopics]) {
             if ([tweet isKindOfClass:%c(_TtC10TwitterURT26URTTimelinePromptViewModel)]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
 
         if ([BHTManager hideWhoToFollow]) {
             if ([class_name isEqualToString:@"T1URTTimelineUserItemViewModel"] || [class_name isEqualToString:@"T1TwitterSwift.URTTimelineCarouselViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleHeaderViewModel"] || [class_name isEqualToString:@"TwitterURT.URTModuleFooterViewModel"]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
 
         if ([BHTManager hidePremiumOffer]) {
             if ([class_name isEqualToString:@"T1URTTimelineMessageItemViewModel"]) {
-                [_orig setHidden:true];
+                shouldHide = YES;
             }
         }
     }
 
-
+    if (shouldHide) {
+        _orig.hidden = YES;
+        _orig.clipsToBounds = YES;
+        _orig.alpha = 0;
+        // Remove all subviews to prevent auto-layout content bleed
+        for (UIView *subview in _orig.contentView.subviews) {
+            [subview removeFromSuperview];
+        }
+        _orig.contentView.frame = CGRectZero;
+    }
 
     return _orig;
 }
