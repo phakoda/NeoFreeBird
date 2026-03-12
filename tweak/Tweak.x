@@ -1138,11 +1138,6 @@ static void BHTApplyCopyButtonStyle(UIButton *copyButton, T1ProfileHeaderView *h
         _orig.hidden = YES;
         _orig.clipsToBounds = YES;
         _orig.alpha = 0;
-        // Remove all subviews to prevent auto-layout content bleed
-        for (UIView *subview in _orig.contentView.subviews) {
-            [subview removeFromSuperview];
-        }
-        _orig.contentView.frame = CGRectZero;
     }
 
     return _orig;

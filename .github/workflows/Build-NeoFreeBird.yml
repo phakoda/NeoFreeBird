@@ -17,16 +17,6 @@ on:
         default: "14.0"
         required: true
         type: string
-      repo_commit:
-        description: "(Optional) Commit for main repo (patches)"
-        default: ""
-        required: false
-        type: string
-      tweak_commit:
-        description: "(Optional) Commit for tweak repo"
-        default: ""
-        required: false
-        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -40,26 +30,15 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout main repo
+      - name: Checkout repo
         uses: actions/checkout@v4.1.1
         with:
-          repository: NeoFreeBird/app
-          path: main
-          ref: ${{ inputs.repo_commit || github.ref }}
-          submodules: recursive
-
-      - name: Checkout tweak repo (NeoFreeBird/tweak)
-        uses: actions/checkout@v4.1.1
-        with:
-          repository: NeoFreeBird/tweak
-          path: tweak
-          ref: ${{ inputs.tweak_commit || 'refs/heads/master' }}
           submodules: recursive
 
       - name: Hide sensitive inputs
         uses: levibostian/action-hide-sensitive-inputs@v1
         with:
-          exclude_inputs: sdk_version,target_version,repo_commit,tweak_commit
+          exclude_inputs: sdk_version,target_version
 
       - name: Download and validate IPA
         run: |
@@ -122,8 +101,8 @@ jobs:
           echo "X_VERSION=${X_VERSION}" >> "$GITHUB_ENV"
           echo "Twitter/X version: $X_VERSION"
           
-          # Apply patches to the extracted Twitter.app
-          PATCH_SRC="${{ github.workspace }}/main/assets/main"
+          # Apply patches from assets/main if they exist
+          PATCH_SRC="${{ github.workspace }}/assets/main"
           if [ -d "${PATCH_SRC}" ]; then
             echo "Applying patches from ${PATCH_SRC}..."
             rsync -av "${PATCH_SRC}/" ${{ github.workspace }}/tmp/Payload/Twitter.app/
