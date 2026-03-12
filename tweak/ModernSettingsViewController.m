@@ -3218,7 +3218,7 @@ if ([type isEqualToString:@"compactButton"]) {
 - (UITableViewCell *)credentialCellWithLabel:(NSString *)labelText
                                 placeholder:(NSString *)placeholder
                                   defaultsKey:(NSString *)key
-                                   textField:(UITextField **)outField
+                                   textField:(UITextField * __strong *)outField
                                        tag:(NSInteger)tag
                                     secure:(BOOL)secure {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
