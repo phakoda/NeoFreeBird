@@ -22,3 +22,4 @@ Temporary Items
 .vscode
 *.db
 /src/images/users/*
+*.ipa
